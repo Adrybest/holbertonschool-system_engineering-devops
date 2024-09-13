@@ -1,0 +1,32 @@
+Readme.
+
+Add:
+- 1 Load Balancer (HAProxy) Cluster
+- 1 Web Server (Nginx)
+- 1 Application Server (Hosting Application Code)
+- 1 Database Server (MySQL)
+
+Explanation of Each Component:
+
+- HAProxy Load Balancer (Cluster Setup):
+    Why it’s added: The load balancer distributes traffic across the web and application servers, ensuring high availability and preventing overload on a single server.
+    Cluster Configuration: The load balancer is set up in a cluster with another HAProxy instance, ensuring redundancy. If one load balancer goes down, the other one can take over, eliminating downtime.
+    Purpose: This ensures both load balancing and fault tolerance, providing uninterrupted service to users even if one load balancer fails.
+
+- Web Server (Nginx):
+    Why it’s added: The web server handles static content like HTML, CSS, JavaScript, and images. It also forwards dynamic requests (requiring business logic) to the application server.
+    Purpose: By splitting the web server from the application server, we improve performance and resource usage. The web server can quickly serve static assets without burdening the application server.
+
+- Application Server:
+    Why it’s added: The application server runs the website’s business logic and handles dynamic content generation, such as database queries, user logins, or API requests.
+    Purpose: Isolating the application layer ensures that computationally expensive tasks, like processing data, do not slow down the delivery of static assets.
+
+- Database Server (MySQL):
+    Why it’s added: The database stores all persistent data for the website, such as user information, transactions, and content.
+Purpose: Separating the database from the application and web servers ensures better data security, reliability, and scalability. It also allows us to optimize database performance independently.
+
+- Why Splitting Components Improves Infrastructure:
+    Scalability: With separate servers for each component (web, application, database), it's easier to scale each one independently based on demand. For instance, if the web server faces heavy traffic, more web servers can be added without touching the database or application server.
+    Fault Tolerance: If one server experiences an issue, the failure is isolated. A problem in the application server won't impact the web server, and vice versa, which increases system stability.
+    Better Resource Management: Each type of server is optimized for specific tasks. Web servers can focus on high-speed file serving, while the application server can handle computationally intensive business logic, and the database server focuses on managing and querying data efficiently.
+    Improved Security: Each server can have its own tailored security measures. For example, firewalls can be set up to allow the application server to communicate with the database server, while blocking access from external networks.

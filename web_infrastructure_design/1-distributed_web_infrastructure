@@ -1,0 +1,40 @@
+On a whiteboard, design a three server web infrastructure that hosts the website www.foobar.com.
+
+Add :
+- Server 1 - Load Balancer (HAProxy)
+- Server 2 - Web Server (Nginx)
+- Server 3 - Application Server (Hosting the Application and MySQL Database)
+
+Explanation of Infrastructure Components:
+
+- Load Balancer (HAProxy):
+    Why it's added: The load balancer (HAProxy) distributes incoming traffic across multiple servers to prevent any single server from being overwhelmed and to improve overall availability.
+    Distribution Algorithm: The load balancer is configured with the Round-Robin algorithm. This method distributes incoming requests sequentially across all available servers. For example, request 1 goes to Server A, request 2 goes to Server B, and the cycle repeats.
+    Active-Active or Active-Passive: This setup is Active-Active. Both web and app servers are actively processing requests, so they can handle traffic simultaneously. An Active-Active setup increases resource utilization and fault tolerance. In contrast, Active-Passive would have one active server and another as a standby, only taking over if the primary fails.
+
+- Web Server (Nginx):
+    Why it's added: The Nginx web server handles static content (HTML, CSS, JavaScript) and forwards dynamic content requests (such as PHP, Python, etc.) to the application server. It also serves as a reverse proxy between users and the application server.
+    This server reduces the load on the application server by handling static file requests separately.
+
+- Application Server (Application Code & MySQL Database):
+    Why it's added: The application server runs the business logic of the website. It processes dynamic content like user authentication, retrieving data from databases, and serving dynamic web pages based on user input.
+    The application server can also connect with the database (MySQL), which stores all persistent data (user profiles, content, logs, etc.).
+
+- Database Cluster (Primary-Replica Setup - MySQL):
+    Primary-Replica Explanation: In this setup, there is one Primary (Master) database and one Replica (Slave) database.
+    The Primary Node is responsible for write operations, where all inserts, updates, and deletes occur.
+    The Replica Node is read-only, receiving copies of the data from the Primary via replication. It helps offload read-heavy operations like querying data, allowing the primary to focus on writes.
+    How it works: The Primary server replicates its data asynchronously to the Replica. Any changes made on the Primary (writes) are copied to the Replica. In case the Primary fails, the Replica can be promoted to the Primary, ensuring data availability.
+    Issues with this Infrastructure
+
+- Single Points of Failure (SPOF):
+    Load Balancer (HAProxy): If the load balancer fails, the entire site goes offline because it controls traffic routing. To address this, a high-availability load balancer setup using HAProxy in an Active-Passive configuration could be employed, or a secondary backup load balancer could be added.
+    Application Server: There's only one application server. If it goes down, the site won't be able to handle dynamic content requests. You can scale horizontally by adding more application servers.
+    Database Primary: If the primary database fails and the Replica isn't promoted quickly, the system won't be able to handle any writes, causing a data outage. A failover mechanism should be added.
+
+- Security Issues:
+    No Firewall: Without a firewall, the system is vulnerable to unauthorized access, DDoS attacks, and other security threats. Firewalls should be configured on each server to allow only necessary traffic.
+    No HTTPS: Communication between users and the website is not encrypted without HTTPS. An SSL certificate should be added to the Nginx web server to encrypt traffic and prevent man-in-the-middle attacks.
+
+- No Monitoring:
+    The infrastructure lacks a monitoring system. Without monitoring, it’s difficult to detect issues like high CPU usage, downtime, and other failures. A monitoring tool (e.g., Prometheus, Nagios, or Zabbix) should be implemented to track server health and alert when problems occur.

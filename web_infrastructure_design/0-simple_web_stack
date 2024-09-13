@@ -1,0 +1,46 @@
+Design a one server web infrastructure that hosts the website that is reachable via www.foobar.com
+
+To access your website:
+
+- user types www.foobar.com in their web browser
+- The browser sends a DNS request to translate www.foobar.com into an IP address
+- The DNS server responds with the IP address 8.8.8.8
+- The browser sends an HTTP/HTTPS request to 8.8.8.8
+- The web server (Nginx) running on 8.8.8.8 receives the request
+- Nginx forwards the request to the application server, which contains the website's logic
+- The application server processes the request and may interact with the database (MySQL) to fetch or store data
+- The application server sends the processed data back to Nginx, which responds to the user’s browser with the rendered webpage
+- The user’s browser displays the content
+
+
+Infrastructure:
+
+- Server (IP: 8.8.8.8):
+    A server is a physical or virtual machine that stores and serves resources to clients over the internet. It hosts the web server, application server, codebase, and database.
+
+- Domain Name (foobar.com):
+    A domain name is a human-readable address (e.g., foobar.com) that maps to the server's IP address (8.8.8.8). It allows users to easily access websites without remembering IP addresses.
+
+- DNS Record (www.foobar.com):
+    The DNS record type for www is a CNAME (Canonical Name) or A record. In this case, www.foobar.com is an A record pointing to the IP address 8.8.8.8.
+
+- Web Server (Nginx):
+    The web server (Nginx) handles incoming HTTP/HTTPS requests from the browser. It can serve static content (like images or HTML files) and forwards dynamic requests to the application server for further processing.
+
+- Application Server:
+    The application server handles dynamic requests, processes business logic, and interacts with the database when necessary. It contains the website’s codebase and processes the core functionality of the website.
+
+- Server-Client Communication:
+    The server communicates with the user’s computer using HTTP/HTTPS protocols over the TCP/IP suite. HTTPS ensures secure, encrypted communication between the server and the client.
+
+
+Issues with this infrastructure:
+
+- Single Point of Failure (SPOF):
+    This infrastructure relies on a single server. If this server fails (due to hardware failure, software crash, etc.), the entire website becomes unavailable. No redundancy exists to take over in case of failure.
+
+- Downtime During Maintenance:
+    When deploying new code or performing server maintenance (e.g., restarting the web server), the site will experience downtime. Since there's only one server, there’s no way to serve traffic while updating or restarting services.
+
+- Inability to Scale:
+    With heavy traffic, a single server may not be able to handle all incoming requests. If the number of users grows, the server could become overloaded, leading to slow performance or complete outages. Scaling with only one server is impossible without additional load balancers or multiple servers.

@@ -1,0 +1,37 @@
+On a whiteboard, design a three server web infrastructure that hosts the website www.foobar.com, it must be secured, serve encrypted traffic, and be monitored.
+
+Add :
+- Server 1 - Load Balancer (HAProxy with SSL termination, firewall, and monitoring client)
+- Server 2 - Web Server (Nginx with firewall, SSL certificate, and monitoring client)
+- Server 3 - Application Server (Application code, MySQL database, firewall, and monitoring client)
+
+Explanation of Infrastructure Components :
+
+- Firewalls:
+    Why they’re added: Each server has its own firewall to filter incoming and outgoing traffic based on security rules, ensuring only legitimate traffic (e.g., HTTP/HTTPS, SSH) is allowed. This reduces exposure to potential attacks and limits access to trusted sources only.
+    Purpose of firewalls: Firewalls are critical for defending the infrastructure from malicious traffic, unauthorized access, and cyberattacks such as Distributed Denial of Service (DDoS). They act as gatekeepers that only permit certain ports (e.g., port 80 for HTTP, port 443 for HTTPS, and port 3306 for MySQL) based on defined rules.
+
+- SSL Certificate for HTTPS (Installed on HAProxy):
+    Why HTTPS is used: Serving traffic over HTTPS encrypts all data in transit between the user and the web server, protecting against eavesdropping and man-in-the-middle attacks. This ensures that sensitive information like login credentials and personal data are securely transmitted.
+    SSL Termination: The SSL certificate is installed on the load balancer (HAProxy), which handles encrypting and decrypting traffic. Once decrypted, the traffic is forwarded to the backend servers in plain HTTP. While this improves performance by offloading SSL operations from backend servers, it introduces potential vulnerabilities (discussed later).
+
+- Monitoring Clients (e.g., Sumo Logic, Datadog):
+    Why monitoring is added: Monitoring helps track the health and performance of each server, including CPU usage, memory consumption, disk space, traffic metrics, and service status. It alerts the team when something goes wrong, like server overload or downtime, to ensure quick incident response.
+    How monitoring works: Each server is equipped with a monitoring client (data collector) that gathers metrics (e.g., CPU usage, request rate, error rate) and sends them to a central monitoring system (e.g., Sumo Logic). These metrics can be visualized on dashboards, and alerts can be set up for specific thresholds.
+    Monitoring QPS (Queries Per Second): To monitor web server QPS, the monitoring tool can be configured to track the number of requests processed by Nginx (web server) per second. Metrics from the Nginx access logs are collected, parsed, and then reported back to the monitoring system to provide insights into how many queries the server is handling at any given time.
+    Issues with the Infrastructure
+
+- SSL Termination at the Load Balancer:
+    Issue: Terminating SSL at the load balancer means that the traffic between the load balancer and the backend servers (web server and application server) is no longer encrypted. This exposes the internal network to attacks if it's compromised.
+    Solution: To avoid this issue, use end-to-end encryption. You can terminate SSL at the load balancer but also re-encrypt the traffic when it forwards to the web and application servers. This ensures the entire traffic path is encrypted.
+
+- Only One MySQL Server Capable of Accepting Writes:
+    Issue: With only one MySQL server accepting writes (Primary in a Primary-Replica setup), the database can become a bottleneck and single point of failure. If the Primary fails, no write operations can be performed until the Replica is promoted.
+    Solution: Set up automatic failover mechanisms to promote a Replica to Primary in the event of failure. Alternatively, consider MySQL clustering or multi-primary setups, where multiple nodes can accept writes, although these come with higher complexity.
+
+- All Servers Have the Same Components:
+    Issue: If each server has all components (web server, application server, and database), it leads to inefficient resource utilization and scaling problems. For example, adding more servers for web traffic shouldn't also add more database instances. It also increases the complexity of ensuring data consistency across all servers.
+    Solution: Separation of concerns should be applied where each server has a dedicated role:
+    The web server handles only static content and forwards requests.
+    The application server runs the dynamic application logic.
+    he database server handles only data storage and queries. This modular approach improves scaling and fault isolation, making the infrastructure more resilient.
