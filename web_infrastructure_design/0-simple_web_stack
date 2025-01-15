@@ -1,0 +1,45 @@
+Design a one server web infrastructure that hosts the website that is reachable via www.foobar.com
+
+To access your website:
+
+- user types www.foobar.com in their web browser
+- The browser sends a DNS request to translate www.foobar.com into an IP address
+- The DNS server responds with the IP address 8.8.8.8
+- The browser sends an HTTP/HTTPS request to 8.8.8.8
+- The web server (Nginx) running on 8.8.8.8 receives the request
+- Nginx forwards the request to the application server, which contains the website's logic
+- The application server processes the request and may interact with the database (MySQL) to fetch or store data
+- The application server sends the processed data back to Nginx, which responds to the user’s browser with the rendered webpage
+- The user’s browser displays the content
+
+
+Infrastructure:
+
+- DNS Configuration:
+    The domain name www.foobar.com has an A record pointing to the server's IP address 8.8.8.8.
+
+- Server Components (Single Machine):
+    Nginx Web Server: Listens on port 80 (HTTP) or 443 (HTTPS).
+    Application Server: Handles requests passed by Nginx, running the application logic.
+    MySQL Database: Stores and retrieves data as needed by the application.
+
+-User Flow:
+    User enters www.foobar.com in the browser.
+    The browser queries DNS to resolve the IP address 8.8.8.8.
+    A request is sent to the server’s Nginx web server.
+    Nginx serves static content or forwards the request to the application server.
+    The application server processes the request, interacts with the MySQL database, and sends the response back to Nginx.
+    Nginx delivers the response to the user’s browser.
+
+
+Issues with this infrastructure:
+
+- Single Point of Failure (SPOF):
+    If the single server fails, the entire website becomes unavailable.
+
+- Downtime During Maintenance:
+    Deploying new code or restarting the web server causes temporary downtime.
+
+- Scalability Limitations:
+    The server cannot handle large amounts of traffic due to limited resources (CPU, RAM, etc.).
+    No load balancing or redundancy is available.
