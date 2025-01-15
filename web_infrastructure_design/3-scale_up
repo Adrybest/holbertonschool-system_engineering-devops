@@ -1,0 +1,54 @@
+Components and Their Roles
+1. Load Balancer (HAProxy Cluster):
+
+- Purpose:
+    Distributes incoming traffic across multiple web servers to balance load and ensure high availability.
+    A cluster of load balancers ensures redundancy—if one fails, the other continues to serve traffic.
+- Why Add It?
+    Prevents a single point of failure at the load-balancer level.
+    Enhances scalability by routing traffic to multiple servers.
+
+2. Web Server (Nginx):
+- Purpose:
+    Handles static content (e.g., HTML, CSS, JavaScript).
+    Serves as a reverse proxy for dynamic requests, forwarding them to the application server.
+- Why Add It?
+    Specializes in efficiently delivering static files and caching to improve response times.
+    Offloads dynamic request processing to the application server.
+
+3. Application Server:
+- Purpose:
+    Processes the business logic of the application, such as authentication, data manipulation, or running backend code.
+    Interfaces with the database to retrieve or update data.
+- Why Add It?
+    Separating the application logic ensures that web server tasks (like static content delivery) do not interfere with business logic execution.
+    Improves resource allocation and scalability.
+
+4. Database Server (MySQL):
+- Purpose:
+    Stores and manages all the website’s data.
+    Handles queries sent from the application server.
+- Why Add It?
+    Isolating the database ensures optimal resource allocation and protects data integrity.
+    Facilitates easier database scaling and clustering if needed.
+
+Infrastructure Overview
+- Load Balancer Cluster:
+    Configured with HAProxy for load distribution and failover.
+    Distributes traffic between multiple web servers.
+- Dedicated Web Server:
+    Focuses exclusively on serving static content and proxying dynamic requests.
+- Dedicated Application Server:
+    Runs the application’s backend logic and interacts with the database.
+- Dedicated Database Server:
+    Handles data storage and retrieval operations.
+
+Why Split Components Across Servers?
+1. Improved Performance:
+    Each server specializes in its role, ensuring efficient resource utilization.
+2. Enhanced Scalability:
+    Adding more servers for specific roles (e.g., scaling web or application servers) is straightforward.
+3. Better Fault Isolation:
+    A failure in one server (e.g., database) does not directly impact other servers.
+4. Easier Maintenance:
+    Individual servers can be updated or maintained without affecting the entire infrastructure.
