@@ -1,0 +1,86 @@
+Components and Their Roles
+1. Firewalls (3 Units):
+
+- Purpose:
+    Protect the servers by controlling incoming and outgoing traffic based on predefined rules.
+    Filter out malicious traffic such as DDoS attacks or unauthorized access attempts.
+- Placement:
+    One firewall is placed at the edge of the infrastructure (before the load balancer).
+    Each server (web server and database) has its own dedicated firewall to restrict internal traffic.
+2. SSL Certificate:
+
+- Purpose:
+    Enables HTTPS, encrypting traffic between the user's browser and the server.
+    Prevents data interception or tampering during transmission.
+3. Monitoring Clients (3 Units):
+
+- Purpose:
+    Collect logs and performance metrics from the servers.
+    Provide insights into server health, traffic patterns, error rates, and resource usage.
+- Monitoring Tool:
+    A third-party solution such as Sumo Logic, Prometheus, or Datadog.
+
+User Flow
+- DNS Resolution:
+    The domain www.foobar.com resolves to the IP address of the load balancer.
+
+- Load Balancer with HTTPS Termination:
+    The load balancer receives HTTPS requests, decrypts them using the SSL certificate, and forwards them to the web server.
+
+- Firewalls:
+    The edge firewall ensures only legitimate traffic reaches the load balancer.
+    Each server-level firewall enforces access control for its respective machine.
+
+- Web Server and Application Server:
+    The web server serves static content or forwards dynamic requests to the application server.
+    The application server processes business logic and interacts with the database.
+
+- Database Interaction:
+    Write requests are sent to the primary database.
+    Read requests are routed to replica nodes if available.
+
+- Monitoring:
+    Logs and metrics are collected by monitoring agents installed on each server.
+    Additional Elements and Their Justifications
+
+a. Firewalls:
+    Protect the infrastructure from external threats like DDoS, SQL injection, or unauthorized access.
+    Ensure only necessary traffic (e.g., HTTP/HTTPS, database queries) reaches the servers.
+
+b. SSL Certificate:
+    Encrypts all communication, ensuring data integrity and user privacy.
+    Builds user trust by displaying the secure HTTPS padlock.
+
+c. Monitoring Clients:
+    Provide visibility into the health and performance of the infrastructure.
+    Help detect anomalies, such as sudden traffic spikes or hardware failures.
+
+Key Features of the Infrastructure
+1. Why Traffic is Served Over HTTPS:
+    To ensure encryption and prevent sensitive data (e.g., login credentials, credit card information) from being intercepted.
+    To comply with modern web security standards and browser requirements.
+
+- 2. Monitoring Tool Purpose:
+    Tracks performance metrics such as CPU usage, memory, network latency, and query per second (QPS).
+    Alerts administrators when thresholds are breached.
+
+3. How Monitoring Collects Data:
+    Agents installed on servers collect logs and metrics.
+    Data is sent to a centralized platform like Sumo Logic for analysis and visualization.
+
+4. Monitoring Web Server QPS (Queries Per Second):
+    Configure the monitoring tool to track incoming HTTP requests to the web server.
+    Use counters or metrics specific to the web server (e.g., Nginx logs).
+
+Issues with This Infrastructure
+1. SSL Termination at Load Balancer Level:
+    Decrypting HTTPS at the load balancer means internal traffic is unencrypted, which could be intercepted.
+    Solution: Use end-to-end encryption by re-encrypting traffic between the load balancer and backend servers.
+
+2. Single MySQL Write Node:
+    Having only one writable MySQL server creates a single point of failure for write operations.
+    Solution: Implement a MySQL cluster with multiple writable nodes or use database sharding.
+
+3. Servers with All Components Combined:
+    Combining web server, application server, and database on the same machine creates resource contention.
+    Solution: Separate these components onto dedicated servers to optimize performance and scalability.
